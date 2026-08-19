@@ -1,6 +1,6 @@
 from fileSniffer import fileSniffer
 from tools import open_app
-
+from cpu import askGEM
 
 print("Friday's here.")
 
@@ -16,10 +16,12 @@ while runner:
     if command == "exit":
         print("Friday: terminating.")
         runner = False
-
-    elif command.startswith("open "):
-        app = command[5:]
-        open_app(app, apps)
-
     else:
-        print("Friday: you said: " + command)
+        action, target = askGEM(command)
+
+        if action == "open_app":
+            open_app(target.lower(), apps) #case sensitivity  
+        elif action == "respond":
+            print(f"Friday: {target}")        
+
+    
