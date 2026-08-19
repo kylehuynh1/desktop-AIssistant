@@ -9,6 +9,8 @@ runner = True
 # Scan installed applications once when Friday starts
 apps = fileSniffer()
 
+def fridayOpenApp(app: str):
+    open_app(app.lower(), apps) #open installed apps on users computer
 
 while runner:
     command = input("You: ")
@@ -17,11 +19,7 @@ while runner:
         print("Friday: terminating.")
         runner = False
     else:
-        action, target = askGEM(command)
-
-        if action == "open_app":
-            open_app(target.lower(), apps) #case sensitivity  
-        elif action == "respond":
-            print(f"Friday: {target}")        
+        answer = askGEM(command, [fridayOpenApp])
+        print(f"Friday: {answer}")
 
     
