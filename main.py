@@ -1,0 +1,1 @@
+print("Friday's here.")
