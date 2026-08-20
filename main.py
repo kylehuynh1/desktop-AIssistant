@@ -1,5 +1,5 @@
 from fileSniffer import fileSniffer
-from tools import open_app
+from tools import open_app, close_app
 from cpu import askGEM
 from router import routeLocal
 from localCpu import askLocal
@@ -15,6 +15,11 @@ def fridayOpenApp(app: str):
     """open installed apps on users computer"""
     open_app(app.lower(), apps) 
 
+def fridayCloseApp(app: str):
+    """close installed apps on users computer"""
+    close_app(app.lower())
+
+
 while runner:
     command = input("You: ")
 
@@ -23,8 +28,8 @@ while runner:
         runner = False
     else:
         handled = routeLocal(command, apps)
-        if handled == False:
-            response = askLocal(command, tools=[fridayOpenApp])
+        if not handled:
+            response = askLocal(command, tools=[fridayOpenApp, fridayCloseApp])
             if response:
                 print("Friday:", response)
 

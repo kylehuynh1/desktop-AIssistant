@@ -1,14 +1,9 @@
-from ollama import chat, Client
+from ollama import chat
 
 def askLocal(prompt, tools):
     toolMap ={}
     for tool in tools:
         toolMap[tool.__name__] = tool
-
-    for tool in tools:
-        print("TOOL NAME:", tool.__name__)
-        print("TOOL DOC:", tool.__doc__)
-        print("ANNOTATIONS:", tool.__annotations__)
 
     response = chat(
         model="qwen2.5:3b",
@@ -29,6 +24,7 @@ def askLocal(prompt, tools):
         ],
         tools=tools
     )
+    print("DEBUG RESPONSE:", response)
 
     if response.message.tool_calls:
         for toolCall in response.message.tool_calls:
