@@ -89,6 +89,3 @@ def adjustVolume(volume):
         adjustScalar = 1
 
     volume_control.SetMasterVolumeLevelScalar(adjustScalar, None)
-
-
-    

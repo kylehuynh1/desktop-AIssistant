@@ -1,5 +1,6 @@
 from fileSniffer import fileSniffer
 from tools import adjustVolume, open_app, close_app, set_volume, unmute_volume, mute_volume
+from manager import find, focus, minimize, maximize
 from cpu import askGEM
 from router import routeLocal
 from localCpu import askLocal
@@ -12,8 +13,17 @@ runner = True
 apps = fileSniffer()
 
 def fridayOpenApp(app: str):
-    """open installed apps on users computer"""
-    open_app(app.lower(), apps) 
+    """
+    Open, launch, show, focus, switch to, or bring up an application.
+    If the application is already running, bring its window to the foreground.
+    Otherwise, launch the application.
+    """
+    hwnd = find(app)
+
+    if hwnd:
+        focus(hwnd)
+    else:
+        open_app(app.lower(), apps)
 
 def fridayCloseApp(app: str):
     """close installed apps on users computer"""
@@ -35,6 +45,15 @@ def fridayAdjustVolume(amount: int):
     """Increase or decrease the current Windows volume by a percentage amount. Use positive values to increase and negative values to decrease."""
     adjustVolume(amount)
 
+def fridayMinimize(app: str):
+    """Minimize an already running application window."""
+    minimize(app)
+
+
+def fridayMaximize(app: str):
+    """Maximize an already running application window."""
+    maximize(app)
+
 while runner:
     command = input("You: ")
 
@@ -42,10 +61,12 @@ while runner:
         print("Friday: terminating.")
         runner = False
     else:
-        handled = routeLocal(command, apps)
-        if not handled:
-            response = askLocal(command, tools=[fridayOpenApp, fridayCloseApp, fridaySetVolume, fridayMute, fridayUnmute, fridayAdjustVolume])
-            if response:
-                print("Friday:", response)
+        response = askLocal(command, tools=[
+            fridayOpenApp, fridayCloseApp, fridaySetVolume, 
+            fridayMute, fridayUnmute, fridayAdjustVolume, 
+            fridayMinimize, fridayMaximize
+            ])
+        if response:
+            print("Friday:", response)
 
     

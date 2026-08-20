@@ -1,6 +1,5 @@
 import psutil
 
-
 activeProcesses = set()
 def processSniffer():
     
@@ -9,4 +8,3 @@ def processSniffer():
         activeProcesses.add(process.info['name'].lower())
 processSniffer()#test
 print(activeProcesses)
-
