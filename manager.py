@@ -3,9 +3,14 @@ import win32con
 from windowSniffer import windowSniffer
 
 def focus(hwnd):
-    if win32gui.IsIconic(hwnd):
-        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
-    win32gui.SetForegroundWindow(hwnd)
+    try:
+        if win32gui.IsIconic(hwnd):
+            win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+        win32gui.SetForegroundWindow(hwnd)
+        return True
+    except Exception as e:
+        print(f"Friday: couldnt focus window: {e}")
+        return False
     
 def find(app):
     windows = windowSniffer()#retrieve window list
@@ -19,9 +24,12 @@ def minimize(app):
     if hwnd:
         win32gui.ShowWindow(hwnd, win32con.SW_MINIMIZE)
         return True 
+    return False
 
 def maximize(app):
     hwnd = find(app)
     if hwnd:
         win32gui.ShowWindow(hwnd, win32con.SW_MAXIMIZE)
         return True 
+    return False
+

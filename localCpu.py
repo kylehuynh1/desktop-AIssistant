@@ -34,6 +34,19 @@ def askLocal(prompt, tools):
             arguments = toolCall.function.arguments
 
             toolFunction = toolMap[toolName]
-            toolFunction(**arguments)
-    return response.message.content
+            result = toolFunction(**arguments)
+            messages.append({
+                "role": "tool",
+                "tool_name": toolName,
+                "content": str(result)
+            })
+            print("tool result: ", result)
+
+    finalResponse = chat(
+    model="qwen2.5:3b",
+    messages=messages,
+    tools=tools
+    )
+
+    return finalResponse.message.content
 

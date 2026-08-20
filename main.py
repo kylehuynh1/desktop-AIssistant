@@ -1,9 +1,11 @@
 from fileSniffer import fileSniffer
+from windowSniffer import windowSniffer
 from tools import adjustVolume, open_app, close_app, set_volume, unmute_volume, mute_volume
 from manager import find, focus, minimize, maximize
 from cpu import askGEM
 from router import routeLocal
 from localCpu import askLocal
+from voiceCMD import getCommand
 
 print("Friday's here.")
 
@@ -47,15 +49,36 @@ def fridayAdjustVolume(amount: int):
 
 def fridayMinimize(app: str):
     """Minimize an already running application window."""
-    minimize(app)
 
+    success = minimize(app)
+
+    if success:
+        return f"{app} was successfully minimized."
+
+    return f"{app} could not be minimized because no matching window was found."
 
 def fridayMaximize(app: str):
     """Maximize an already running application window."""
-    maximize(app)
+
+    success = maximize(app)
+
+    if success:
+        return f"{app} was successfully maximized."
+
+    return f"{app} could not be maximized because no matching window was found."
+
+def fridayReturnWindows():
+    """Return a list of currently open windows on the user's computer."""
+    windows = windowSniffer()
+    titles=[]
+
+    for window in windows:
+        titles.append(window["title"])
+
+    return titles
 
 while runner:
-    command = input("You: ")
+    command = getCommand()
 
     if command == "exit":
         print("Friday: terminating.")
@@ -64,7 +87,7 @@ while runner:
         response = askLocal(command, tools=[
             fridayOpenApp, fridayCloseApp, fridaySetVolume, 
             fridayMute, fridayUnmute, fridayAdjustVolume, 
-            fridayMinimize, fridayMaximize
+            fridayMinimize, fridayMaximize, fridayReturnWindows
             ])
         if response:
             print("Friday:", response)
