@@ -1,13 +1,27 @@
-from ollama import chat
-
-def testOpenApp(app: str):
-    """Open an installed application on the user's Windows computer."""
-    print(f"LOCAL TOOL CALLED: {app}")
+from ollama import chat, Client
 
 def askLocal(prompt, tools):
+    toolMap ={}
+    for tool in tools:
+        toolMap[tool.__name__] = tool
+
+    for tool in tools:
+        print("TOOL NAME:", tool.__name__)
+        print("TOOL DOC:", tool.__doc__)
+        print("ANNOTATIONS:", tool.__annotations__)
+
     response = chat(
         model="qwen2.5:3b",
         messages=[
+            {
+                "role": "system",
+                "content": (
+                    "You are Friday, a Windows desktop AI assistant. "
+                    "You have access to tools that can control the user's computer. "
+                    "When the user's request can be completed using an available tool, "
+                    "use that tool instead of explaining how to do it."
+                )
+            },
             {
                 "role": "user",
                 "content": prompt
@@ -15,27 +29,13 @@ def askLocal(prompt, tools):
         ],
         tools=tools
     )
-    return response
 
-toolMap = {
-    "testOpenApp": testOpenApp
-}
+    if response.message.tool_calls:
+        for toolCall in response.message.tool_calls:
+            toolName = toolCall.function.name
+            arguments = toolCall.function.arguments
 
-response = askLocal(
-    "yo can u throw spotify on",
-    [testOpenApp]
-)
-
-toolCall = response.message.tool_calls[0]
-
-toolName = toolCall.function.name
-arguments = toolCall.function.arguments
-app = arguments["app"]
-
-toolFunction = toolMap[toolName]
-
-toolFunction(**arguments)
-
-print(toolName)
-print(app)
+            toolFunction = toolMap[toolName]
+            toolFunction(**arguments)
+    return response.message.content
 
