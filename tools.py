@@ -15,18 +15,15 @@ def open_app(app, apps):
         os.startfile(app_path)
 
         print(f"Friday: now opening {app}.")
+        return True
 
     except KeyError:
-        print(
-            f"Friday: I couldn't find '{app}' "
-            "in your installed applications."
-        )
+        print(f"Friday: I couldn't find '{app}'.")
+        return False
 
     except OSError:
-        print(
-            f"Friday: I found '{app}', "
-            "but Windows couldn't launch it."
-        )
+        print(f"Friday: Windows couldn't launch '{app}'.")
+        return False
 
 def close_app(app):
     app = app.lower()
@@ -44,8 +41,10 @@ def close_app(app):
 
     if result.returncode == 0:
         print(f"Friday: now closing {app}.")
+        return True
     else:
         print(f"Friday: I couldn't close {app}.")
+        return False
 
 
 def set_volume(volume):

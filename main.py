@@ -6,13 +6,34 @@ from cpu import askGEM
 from router import routeLocal
 from localCpu import askLocal
 from voiceCMD import getCommand
-
-print("Friday's here.")
-
+from tts import speak
 runner = True
 
-# Scan installed applications once when Friday starts
+#scans installed applications once when Friday starts
 apps = fileSniffer()
+
+def startupDisplay():
+    print(r"""
+    ███████╗██████╗ ██╗██████╗  █████╗ ██╗   ██╗
+    ██╔════╝██╔══██╗██║██╔══██╗██╔══██╗╚██╗ ██╔╝
+    █████╗  ██████╔╝██║██║  ██║███████║ ╚████╔╝
+    ██╔══╝  ██╔══██╗██║██║  ██║██╔══██║  ╚██╔╝
+    ██║     ██║  ██║██║██████╔╝██║  ██║   ██║
+    ╚═╝     ╚═╝  ╚═╝╚═╝╚═════╝ ╚═╝  ╚═╝   ╚═╝
+
+                 F.R.I.D.A.Y.
+          Desktop Intelligence System
+
+    [✓] Wake Engine
+    [✓] Speech Recognition
+    [✓] Local Intelligence
+    [✓] System Control
+    [✓] Voice Synthesis
+
+    STATUS: ONLINE
+    Waiting for wake phrase...
+    """)
+
 
 def fridayOpenApp(app: str):
     """
@@ -23,17 +44,36 @@ def fridayOpenApp(app: str):
     hwnd = find(app)
 
     if hwnd:
-        focus(hwnd)
-    else:
-        open_app(app.lower(), apps)
+        success = focus(hwnd)
+
+        if success:
+            return f"{app} was successfully focused."
+
+        return f"{app} is running but could not be focused."
+
+    success = open_app(app.lower(), apps)
+
+    if success:
+        return f"{app} was successfully launched."
+
+    return f"{app} could not be launched."
 
 def fridayCloseApp(app: str):
-    """close installed apps on users computer"""
-    close_app(app.lower())
+    """
+    Close, kill, quit, terminate, exit, or shut down a running application.
+    Use this tool when the user asks to close or kill an application.
+    """
+    result = close_app(app.lower())
+
+    if result:
+        return f"{app} was successfully closed."
+
+    return f"{app} could not be closed."
 
 def fridaySetVolume(volume: int):
     """set volume on users computer"""
     set_volume(volume)
+    return f"System volume was successfully set to {volume}%."
 
 def fridayMute():
     """mutes volume on user computer"""
@@ -77,19 +117,38 @@ def fridayReturnWindows():
 
     return titles
 
-while runner:
-    command = getCommand()
+startupDisplay()
 
-    if command == "exit":
-        print("Friday: terminating.")
-        runner = False
-    else:
+while runner:
+    try:
+        command = getCommand()
+
+        cleanCommand = command.lower().strip().rstrip(".!?")
+
+        if cleanCommand in [
+            "go offline",
+            "shut down friday",
+            "shutdown friday",
+            "terminate",
+            "goodbye friday"
+        ]:
+            print("Friday: going offline.")
+            speak("Going offline.")
+            runner = False
+            continue
+
+        # Only reaches Qwen if it wasn't a shutdown command
         response = askLocal(command, tools=[
-            fridayOpenApp, fridayCloseApp, fridaySetVolume, 
-            fridayMute, fridayUnmute, fridayAdjustVolume, 
-            fridayMinimize, fridayMaximize, fridayReturnWindows
-            ])
+            # your tools
+        ])
+
         if response:
             print("Friday:", response)
+            speak(response)
 
-    
+    except KeyboardInterrupt:
+        print("\nFriday: terminating.")
+        runner = False
+
+    except Exception as e:
+        print(f"Friday: error: {e}")
