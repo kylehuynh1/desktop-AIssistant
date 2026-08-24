@@ -1,6 +1,7 @@
 import os
 import subprocess
 from pycaw.pycaw import AudioUtilities
+import pyautogui
 
 process_names = {
     "spotify": "Spotify.exe",
@@ -88,3 +89,22 @@ def adjustVolume(volume):
         adjustScalar = 1
 
     volume_control.SetMasterVolumeLevelScalar(adjustScalar, None)
+
+def media_play_pause():
+    pyautogui.press("playpause")
+    return "Media playback was toggled."
+
+
+def media_next():
+    pyautogui.press("nexttrack")
+    return "Skipped to the next track."
+
+
+def media_previous():
+    pyautogui.press("prevtrack")
+    return "Returned to the previous track."
+
+
+def media_stop():
+    pyautogui.press("stop")
+    return "Media playback was stopped."

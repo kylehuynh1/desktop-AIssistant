@@ -45,34 +45,42 @@ def askLocal(prompt, tools):
 
     print("DEBUG RESPONSE:", response)
 
-    if response.message.tool_calls:
-        for toolCall in response.message.tool_calls:
-            toolName = toolCall.function.name
-            arguments = toolCall.function.arguments
+    # If Qwen did NOT request a tool,
+    # its first response is already the final response.
+    if not response.message.tool_calls:
+        return response.message.content
 
-            try:
-                toolFunction = toolMap[toolName]
-                result = toolFunction(**arguments)
 
-            except KeyError:
-                result = f"Tool failed: {toolName} does not exist."
+    # Otherwise execute the requested tools
+    for toolCall in response.message.tool_calls:
+        toolName = toolCall.function.name
+        arguments = toolCall.function.arguments
 
-            except Exception as e:
-                result = f"Tool failed: {e}"
+        try:
+            toolFunction = toolMap[toolName]
+            result = toolFunction(**arguments)
 
-            messages.append({
-                "role": "tool",
-                "tool_name": toolName,
-                "content": str(result)
-            })
+        except KeyError:
+            result = f"Tool failed: {toolName} does not exist."
 
-            print("tool result: ", result)
+        except Exception as e:
+            result = f"Tool failed: {e}"
 
+        messages.append({
+            "role": "tool",
+            "tool_name": toolName,
+            "content": str(result)
+        })
+
+        print("tool result: ", result)
+
+
+    # Only call Qwen again if we actually executed a tool.
     finalResponse = chat(
-    model="qwen2.5:3b",
-    messages=messages,
-    tools=tools
-)
+        model="qwen2.5:3b",
+        messages=messages,
+        tools=tools
+    )
 
     messages.append(finalResponse.message)
 
