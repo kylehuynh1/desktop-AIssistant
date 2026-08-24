@@ -788,6 +788,14 @@ class FridayWindow(QWidget):
             "NONE"
         )
 
+        # ----------------------------------------------------
+        # DISPLAY MODE
+        # ----------------------------------------------------
+
+        # P toggles a higher-visibility profile intended
+        # for low-resolution / low-contrast projectors.
+        self.projectorMode = False
+
 
         # ----------------------------------------------------
         # ANIMATED CORE
@@ -907,26 +915,64 @@ class FridayWindow(QWidget):
             )
 
             # ----------------------------------------------------
-            # COLORS
+            # DISPLAY PROFILE
             # ----------------------------------------------------
 
-            cyan = QColor(
-                90,
-                220,
-                255
-            )
+            if self.projectorMode:
+                titleSize = 24
+                subtitleSize = 12
+                telemetrySize = 12
+                stateSize = 20
+                footerSize = 9
 
-            dimCyan = QColor(
-                60,
-                150,
-                180
-            )
+                mainLineWidth = 3
+                detailLineWidth = 2
 
-            faintCyan = QColor(
-                40,
-                100,
-                120
-            )
+                cyan = QColor(
+                    170,
+                    245,
+                    255
+                )
+
+                dimCyan = QColor(
+                    115,
+                    215,
+                    235
+                )
+
+                faintCyan = QColor(
+                    80,
+                    165,
+                    185
+                )
+
+            else:
+                titleSize = 18
+                subtitleSize = 9
+                telemetrySize = 9
+                stateSize = 13
+                footerSize = 7
+
+                mainLineWidth = 1
+                detailLineWidth = 1
+
+                cyan = QColor(
+                    90,
+                    220,
+                    255
+                )
+
+                dimCyan = QColor(
+                    60,
+                    150,
+                    180
+                )
+
+                faintCyan = QColor(
+                    40,
+                    100,
+                    120
+                )
 
             # ----------------------------------------------------
             # HEADER
@@ -935,14 +981,15 @@ class FridayWindow(QWidget):
             painter.setPen(
                 QPen(
                     cyan,
-                    1
+                    mainLineWidth
                 )
             )
 
             painter.setFont(
                 QFont(
                     "Consolas",
-                    18
+                    titleSize,
+                    QFont.Bold if self.projectorMode else QFont.Normal
                 )
             )
 
@@ -955,7 +1002,8 @@ class FridayWindow(QWidget):
             painter.setFont(
                 QFont(
                     "Consolas",
-                    9
+                    subtitleSize,
+                    QFont.Bold if self.projectorMode else QFont.Normal
                 )
             )
 
@@ -979,7 +1027,7 @@ class FridayWindow(QWidget):
             painter.setPen(
                 QPen(
                     faintCyan,
-                    1
+                    detailLineWidth
                 )
             )
 
@@ -1008,7 +1056,8 @@ class FridayWindow(QWidget):
             painter.setFont(
                 QFont(
                     "Consolas",
-                    9
+                    telemetrySize,
+                    QFont.Bold if self.projectorMode else QFont.Normal
                 )
             )
 
@@ -1049,7 +1098,7 @@ class FridayWindow(QWidget):
             painter.setPen(
                 QPen(
                     faintCyan,
-                    2
+                    3 if self.projectorMode else 2
                 )
             )
 
@@ -1087,7 +1136,8 @@ class FridayWindow(QWidget):
             painter.setFont(
                 QFont(
                     "Consolas",
-                    13
+                    stateSize,
+                    QFont.Bold
                 )
             )
 
@@ -1100,7 +1150,8 @@ class FridayWindow(QWidget):
             painter.setFont(
                 QFont(
                     "Consolas",
-                    9
+                    telemetrySize,
+                    QFont.Bold if self.projectorMode else QFont.Normal
                 )
             )
 
@@ -1159,7 +1210,7 @@ class FridayWindow(QWidget):
             painter.setPen(
                 QPen(
                     faintCyan,
-                    2
+                    3 if self.projectorMode else 2
                 )
             )
 
@@ -1179,7 +1230,7 @@ class FridayWindow(QWidget):
             painter.setPen(
                 QPen(
                     dimCyan,
-                    1
+                    mainLineWidth
                 )
             )
 
@@ -1251,7 +1302,8 @@ class FridayWindow(QWidget):
             painter.setFont(
                 QFont(
                     "Consolas",
-                    7
+                    footerSize,
+                    QFont.Bold if self.projectorMode else QFont.Normal
                 )
             )
 
@@ -1303,6 +1355,28 @@ class FridayWindow(QWidget):
         self,
         event
     ):
+
+        # P - PROJECTOR MODE
+        if (
+            event.key()
+            == Qt.Key_P
+        ):
+
+            self.projectorMode = (
+                not self.projectorMode
+            )
+
+            if self.projectorMode:
+                print(
+                    "Friday Visual: PROJECTOR MODE"
+                )
+            else:
+                print(
+                    "Friday Visual: MONITOR MODE"
+                )
+
+            self.update()
+            return
 
         # F11
         if (
